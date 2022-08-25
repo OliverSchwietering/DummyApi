@@ -1,0 +1,83 @@
+version: '3.7'
+
+services:
+
+  traefik:
+    image: traefik:1.7
+    command: --docker --docker.exposedbydefault=false
+    ports:
+      - "80:80"
+    environment:
+      TRAEFIK_HTTPS_COMPRESSION: 'false'
+      TRAEFIK_HTTP_COMPRESSION: 'false'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  app:
+    image: thecodingmachine/php:8.1-v4-apache-node16
+    labels:
+      - traefik.enable=true
+      - traefik.backend=app
+      - traefik.frontend.rule=Host:dummy-api.localhost
+    environment:
+      APACHE_DOCUMENT_ROOT: "public/"
+      PHP_EXTENSION_XDEBUG: "1"
+      PHP_INI_MEMORY_LIMIT: "2G"
+      PHP_EXTENSION_GD: "1"
+      PHP_EXTENSION_INTL: "1"
+      PHP_EXTENSIONS: intl curl pdo_mysql
+      # Symfony
+      APP_ENV: "dev"
+      APP_SECRET: "8d2a5c935d8ef1c0e2b751147382bc75"
+      DATABASE_URL: "mysql://symfony:symfony@mysql:3306/symfony?serverVersion=13"
+
+    volumes:
+      - .:/var/www/html:rw
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: "secret"
+      MYSQL_DATABASE: "symfony"
+      MYSQL_USER: "symfony"
+      MYSQL_PASSWORD: "symfony"
+    command: --max_allowed_packet=67108864
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./dev-ops/services/mysql/utf8mb4.cnf:/etc/mysql/conf.d/utf8mb4.cnf:ro
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:4.7
+    labels:
+      - traefik.enable=true
+      - traefik.backend=phpmyadmin
+      - traefik.frontend.rule=Host:phpmyadmin.localhost
+    environment:
+      PMA_HOST: "mysql"
+      PMA_USER: "symfony"
+      PMA_PASSWORD: "symfony"
+
+  ###> doctrine/doctrine-bundle ###
+  database:
+    ports:
+      - "5432"
+    image: postgres:${POSTGRES_VERSION:-13}-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      # You should definitely change the password in production
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ChangeMe}
+      POSTGRES_USER: ${POSTGRES_USER:-symfony}
+    volumes:
+      - db-data:/var/lib/postgresql/data:rw
+      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
+      # - ./docker/db/data:/var/lib/postgresql/data:rw
+###< doctrine/doctrine-bundle ###
+
+volumes:
+
+  mysql_data:
+    driver: local
+
+  ###> doctrine/doctrine-bundle ###
+  db-data:
+###< doctrine/doctrine-bundle ###

@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Error!{% endblock %}
+
+{% block body %}
+    <div class="container p-3">
+        {% if error is defined %}
+            <div class="alert alert-danger">
+                <p>{{ error.message }}</p>
+            </div>
+        {% else %}
+            <div class="alert alert-danger">
+                <p>An error was thrown but no error message is provided.</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
