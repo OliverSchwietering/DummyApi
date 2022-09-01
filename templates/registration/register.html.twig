@@ -2,9 +2,20 @@
 
 {% block title %}Register{% endblock %}
 
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('app_register') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('app_register') }}
+{% endblock %}
+
 {% block body %}
     <div class="container d-flex justify-content-center">
-        <div class="register-modal w-100">
+        <div class="card mt-5 p-5 w-100 register-modal">
             {% for flash_error in app.flashes('verify_email_error') %}
                 <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
             {% endfor %}
@@ -12,13 +23,22 @@
             <h1>Register</h1>
 
             {{ form_start(registrationForm) }}
-            {{ form_row(registrationForm.email) }}
-            {{ form_row(registrationForm.plainPassword, {
-                label: 'Password'
-            }) }}
-            {{ form_row(registrationForm.agreeTerms) }}
 
-            <button type="submit" class="btn">Register</button>
+            <div class="mb-3">
+                {{ form_row(registrationForm.email, {
+                    label: 'Email',
+                    attr: {'class': 'form-control'}
+                }) }}
+            </div>
+            <div class="mb-3">
+                {{ form_row(registrationForm.plainPassword, {
+                    label: 'Password',
+                    attr: {'class': 'form-control'}
+                }) }}
+            </div>
+            {{ form_row(registrationForm.agreeTerms) }}
+            <br>
+            <button type="submit" class="btn btn-primary">Register</button>
             {{ form_end(registrationForm) }}
         </div>
     </div>

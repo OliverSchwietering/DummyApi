@@ -31,8 +31,14 @@ class DummyApiEndpoint
     #[ORM\JoinColumn(nullable: false)]
     private ?DummyApi $dummyApi = null;
 
-    #[ORM\OneToMany(mappedBy: 'dummyApiEndpoint', targetEntity: DummyApiHeader::class)]
+    #[ORM\OneToMany(mappedBy: 'dummyApiEndpoint', targetEntity: DummyApiHeader::class, orphanRemoval: true)]
     private Collection $dummyApiHeaders;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $responseContent = null;
+
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    private ?int $responseCode = null;
 
     public function __construct()
     {
@@ -118,6 +124,30 @@ class DummyApiEndpoint
                 $dummyApiHeader->setDummyApiEndpoint(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getResponseContent(): ?string
+    {
+        return $this->responseContent;
+    }
+
+    public function setResponseContent(?string $responseContent): self
+    {
+        $this->responseContent = $responseContent;
+
+        return $this;
+    }
+
+    public function getResponseCode(): ?int
+    {
+        return $this->responseCode;
+    }
+
+    public function setResponseCode(int $responseCode): self
+    {
+        $this->responseCode = $responseCode;
 
         return $this;
     }

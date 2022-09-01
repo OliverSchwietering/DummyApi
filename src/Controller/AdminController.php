@@ -50,7 +50,7 @@ class AdminController extends AbstractController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $entity = new DummyApi();
-        return $this->render('admin/api_detail.html.twig', ["entityClass" => DummyApi::class,"entity" => $entity,"create" => true]);
+        return $this->render('admin/api_detail.html.twig', ["entity" => $entity,"create" => true]);
     }
 
     #[Route('/admin/dummy-api/{id}', name: 'app_admin_api_detail')]
@@ -58,6 +58,16 @@ class AdminController extends AbstractController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $api = $this->doctrine->getRepository(DummyApi::class)->findOneBy(["id" => $id, "user" => $this->getUser()]);
-        return $this->render('admin/api_detail.html.twig', ["entityClass" => DummyApi::class,"entity" => $api, "dummyEndpointEntityClass" => DummyApiEndpoint::class, "dummyHeaderEntityClass" => DummyApiHeader::class]);
+        return $this->render('admin/api_detail.html.twig', ["entity" => $api]);
+    }
+
+    #[Route('/admin/dummy-api-endpoint/{id}', name: 'app_admin_api_endpoint_detail')]
+    public function apiEndpointDetail(string $id, Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        /** @var DummyApiEndpoint $apiEndpoint */
+        $apiEndpoint = $this->doctrine->getRepository(DummyApiEndpoint::class)->findOneBy(["id" => $id]);
+        if($apiEndpoint->getDummyApi()->getUser()->getId() !== $this->getUser()->getId()) return $this->redirectToRoute('app_admin');
+        return $this->render('admin/api_endpoint_detail.html.twig', ["entity" => $apiEndpoint]);
     }
 }

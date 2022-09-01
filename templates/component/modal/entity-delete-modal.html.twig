@@ -1,0 +1,13 @@
+{% extends "component/modal/base-modal.html.twig" %}
+
+{% block modal_body %}
+    <form action="{{ path('app_entity_delete', {id: entityId}) }}" method="post">
+        <input type="hidden" name="success-redirect" value="{{ successRedirect }}" />
+        <input type="hidden" name="success-redirect-type" value="path" />
+        <input type="hidden" name="entity-class" value="{{ entityClassName }}" />
+        <div class="modal-footer d-flex justify-content-center">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            <button type="submit" class="btn btn-danger">Yes</button>
+        </div>
+    </form>
+{% endblock %}

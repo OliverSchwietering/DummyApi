@@ -1,0 +1,33 @@
+{% extends "component/modal/base-modal.html.twig" %}
+
+{% block modal_body %}
+    <form action="{{ path('app_entity_create') }}" method="post">
+        <div class="modal-body">
+            <input type="hidden" name="entity-class" value="{{ getApiHeaderClassName() }}" />
+            <input type="hidden" name="success-redirect" value="{{ successRedirect }}" />
+            <input type="hidden" name="success-redirect-type" value="path" />
+            {% for key,value in hiddenValues %}
+                <input type="hidden" name="{{ key }}" value="{{ value }}"/>
+            {% endfor %}
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" name="name" id="headerName" placeholder="Key">
+                <label for="name">Key</label>
+            </div>
+            <div class="form-floating mb-3">
+                <select class="form-select" id="headerType" name="type" aria-label="Floating label select example">
+                    <option value="required-any" selected>ANY VALUE</option>
+                    <option value="required-value">REQUIRED VALUE</option>
+                </select>
+                <label for="floatingSelect">Select Value-Type</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" name="value" id="value" placeholder="Required Value">
+                <label for="value">Value</label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </form>
+{% endblock %}

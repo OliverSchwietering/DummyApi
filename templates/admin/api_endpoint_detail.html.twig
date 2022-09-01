@@ -1,0 +1,119 @@
+{% extends "base.html.twig" %}
+
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('app_admin_api_detail') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('app_admin_api_detail') }}
+{% endblock %}
+
+{% block title %}
+    {% if entity is defined and create is not defined %}
+        Endpoint {{ entity.path }}
+    {% else %}
+        Endpoint
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <form action="{{ path('app_entity_update', {id: entity.id}) }}" id="entityUpdateForm" method="post"></form>
+    <div class="container pt-5 ps-5 pe-5 d-flex justify-content-end">
+        <div class="btn-group" role="group" aria-label="Basic example">
+            <button form="entityUpdateForm" type="submit" class="btn btn-outline-primary">Save</button>
+            <button type="button" class="btn btn-outline-danger"  data-bs-toggle="modal" data-bs-target="#deleteApiEndpointModal">Delete</button>
+        </div>
+    </div>
+    <div class="container p-5">
+            <input form="entityUpdateForm" type="hidden" name="entity-class" value="{{ getApiEndpointClassName() }}" />
+            <input form="entityUpdateForm" type="hidden" name="success-redirect" value="{{ path('app_admin_api_endpoint_detail', {id: entity.id}) }}" />
+            <input form="entityUpdateForm" type="hidden" name="success-redirect-type" value="path" />
+            <input form="entityUpdateForm" type="hidden" name="dummyApiId" value="{{ entity.dummyApi.id }}"/>
+            <div class="form-floating mb-3">
+                <input form="entityUpdateForm" type="text" class="form-control" name="path" id="endpointPath" placeholder="Path" value="{{ entity.path }}">
+                <label for="path">Path</label>
+            </div>
+            <div class="form-floating mb-3">
+                <select form="entityUpdateForm" class="form-select multi-select" style="height: 200px" id="allowedMethods" name="allowedMethods[]" multiple aria-label="Floating multiple select">
+                    {% set initialMethods = ["get", "post", "put", "patch", "delete", "propfind", "view"] %}
+                    {% for initMethod in initialMethods %}
+                        <option value="{{ initMethod }}" {% if initMethod in entity.allowedMethods %}selected{% endif %}>{{ initMethod|upper }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="text-center mt-5 mb-3">
+                <h5>Api-Endpoint-Level Headers</h5>
+                <div class="text-start">
+                    <ol class="list-group">
+                        {% for header in entity.dummyApiHeaders %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <form action="{{ path('app_entity_delete', {id: header.id}) }}" method="post" id="dummy-header-form-{{ header.id }}"></form>
+                                <div class="ms-2 me-auto flex-column">
+                                    <div class="fw-bold">{{ header.name }}</div>
+                                    {{ header.type | upper}}
+                                </div>
+                                <div class="flex-column text-end">
+                                    {% if header.value %}
+                                        <b>{{ header.value }}</b>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-column text-center ms-2">
+                                    <input form="dummy-header-form-{{ header.id }}" type="hidden" name="success-redirect" value="{{ path('app_admin_api_detail', {id: entity.id}) }}" />
+                                    <input form="dummy-header-form-{{ header.id }}" type="hidden" name="success-redirect-type" value="path" />
+                                    <input form="dummy-header-form-{{ header.id }}" type="hidden" name="entity-class" value="{{ getApiHeaderClassName() }}" />
+                                    <button form="dummy-header-form-{{ header.id }}" type="submit" class="btn btn-outline-danger">X</button>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ol>
+                </div>
+                <button class="btn btn-outline-primary mt-3 addEndpointHeaderButton" type="button" data-entity-id="{{ entity.id }}" data-bs-toggle="modal" data-bs-target="#headerEndpointModal">Add</button>
+            </div>
+
+            <div class="text-center mt-5 mb-3">
+                <h5>Response</h5>
+            </div>
+            <div class="form-floating mb-3">
+                <input form="entityUpdateForm" type="number" class="form-control" name="responseCode" id="responseCode" placeholder="Response Code" value="{{ entity.responseCode }}">
+                <label for="responseCode">Response Code</label>
+            </div>
+            <select form="entityUpdateForm" class="form-select mb-3" id="contentType" name="contentType" aria-label="select">
+                {% set initialContentTypes = ["json", "xml"] %}
+                {% for initType in initialContentTypes %}
+                    <option value="{{ initType }}" {% if initType == entity.contentType %}selected{% endif %}>{{ initType|upper }}</option>
+                {% endfor %}
+            </select>
+            <div class="mb-3">
+                <label for="exampleFormControlTextarea1" class="form-label">Response Content</label>
+                <textarea form="entityUpdateForm" class="form-control" id="responseContent" name="responseContent" rows="10">{{ entity.responseContent }}</textarea>
+            </div>
+
+            <br><br>
+    </div>
+
+
+
+    <!-- Header modal -->
+    {% include "component/modal/api-header-create-modal.html.twig" with {
+        id: 'headerEndpointModal',
+        title: 'Add Header to Dummy-Api-Endpoint',
+        successRedirect: path('app_admin_api_endpoint_detail', {id: entity.id}),
+        hiddenValues: {
+            dummyApiEndpointId: entity.id
+        }
+    } %}
+
+
+    <!-- Delete Api Endpoint Modal -->
+    {% include "component/modal/entity-delete-modal.html.twig" with {
+        id: 'deleteApiEndpointModal',
+        title: 'Delete?',
+        entityId: entity.id,
+        entityClassName: getApiEndpointClassName(),
+        successRedirect: path('app_admin')
+    } %}
+{% endblock %}

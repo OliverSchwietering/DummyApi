@@ -1,0 +1,19 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+
+    {% set user = getUser() %}
+    <div class="container">
+        <form action="{{ path('app_entity_update', {id: user.id}) }}" id="entityUpdateForm" method="post"></form>
+
+        {{ dump(user) }}
+        <div class="row">
+            <div class="mb-3">
+                <input class="form-control" type="text" value="{{ user.email }}" aria-label="Disabled input" disabled readonly>
+            </div>
+            <div class="mb-3">
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -60,7 +60,6 @@ class EntityController extends AbstractController
     public function update(string $id, Request $request): Response
     {
         $this->flashMessageGenerator = new FlashMessageGenerator($request);
-
         try {
             $parameters = $this->parseEntityParameters($request);
             if($parameters instanceof Response)
@@ -78,6 +77,7 @@ class EntityController extends AbstractController
                 if(!method_exists($entity, $setter)) continue;
                 $entity->$setter($value);
             }
+
             $this->doctrine->getManager()->flush();
 
             return match ($successRedirectType) {
@@ -142,7 +142,11 @@ class EntityController extends AbstractController
                     if($id === null) break;
                     $value = $this->doctrine->getRepository(DummyApiEndpoint::class)->findOneBy(["id" => $id]);
                     break;
+                case "responseCode":
+                    $value = (int)$request->request->get('responseCode');
+                    break;
             }
+
             if($value === null){
                 continue;
             }

@@ -27,7 +27,7 @@ class DummyApi
     #[ORM\OneToMany(mappedBy: 'dummyApi', targetEntity: DummyApiEndpoint::class, orphanRemoval: true)]
     private Collection $dummyApiEndpoints;
 
-    #[ORM\OneToMany(mappedBy: 'dummyApi', targetEntity: DummyApiHeader::class)]
+    #[ORM\OneToMany(mappedBy: 'dummyApi', targetEntity: DummyApiHeader::class, orphanRemoval: true)]
     private Collection $dummyApiHeaders;
 
     public function __construct()

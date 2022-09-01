@@ -31,8 +31,23 @@ class DummyApiController extends AbstractController
         $endpoints = $entity->getDummyApiEndpoints()->getValues();
         $search = array_filter($endpoints, function(DummyApiEndpoint $endpoint)use($path){return PathComparer::compare($endpoint->getPath(), $path);});
         if(empty($search)) return new JsonResponse(["message" => "Endpoint not found"]);
+        $dummyApiEndpoint = $search[array_key_first($search)];
 
-        dd(RequestValidator::valid($entity, $request));
+        $requestValid = RequestValidator::valid($entity, $dummyApiEndpoint, $request);
+        if(!$requestValid) return new JsonResponse(["message" => "Given request data is not valid (missing header-variable or wrong method?)"]);
+
+        $contentType = match($dummyApiEndpoint->getContentType()){
+            "json" => "application/json",
+            "xml" => "application/xml",
+            default => null
+        };
+
+        $response = new Response();
+        $response->setStatusCode($dummyApiEndpoint->getResponseCode() ?? 200);
+        $response->setContent($dummyApiEndpoint->getResponseContent() ?? null);
+        if($contentType !== null)
+            $response->headers->set('Content-Type', $contentType);
+        return $response;
     }
 
 }

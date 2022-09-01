@@ -22,4 +22,10 @@ class LoginController extends AbstractController
             'hideNav' => true
         ]);
     }
+
+    #[Route('/logout', name: 'app_logout')]
+    public function logout(): \Symfony\Component\HttpFoundation\RedirectResponse
+    {
+        return $this->redirectToRoute('app_login');
+    }
 }

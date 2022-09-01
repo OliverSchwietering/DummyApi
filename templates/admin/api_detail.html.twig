@@ -31,7 +31,7 @@
     <div class="container {% if create is defined %}p-5{% else %}ps-5 pe-5 pb-5{% endif %}">
         <form action="{% if create is defined %}{{ path('app_entity_create') }}{% else %}{{ path('app_entity_update', {id: entity.id}) }}{% endif %}" method="post" id="dummy-form"></form>
 
-        <input form="dummy-form" type="hidden" name="entity-class" value="{{ entityClass }}">
+        <input form="dummy-form" type="hidden" name="entity-class" value="{{ getApiClassName() }}">
         <input form="dummy-form" type="hidden" name="success-redirect" value="app_admin_api_detail">
         <input form="dummy-form" type="hidden" name="success-redirect-type" value="entity-detail-route" />
 
@@ -61,7 +61,7 @@
                                 <div class="flex-column text-center ms-2">
                                     <input form="dummy-header-form-{{ header.id }}" type="hidden" name="success-redirect" value="{{ path('app_admin_api_detail', {id: entity.id}) }}" />
                                     <input form="dummy-header-form-{{ header.id }}" type="hidden" name="success-redirect-type" value="path" />
-                                    <input form="dummy-header-form-{{ header.id }}" type="hidden" name="entity-class" value="{{ dummyHeaderEntityClass }}" />
+                                    <input form="dummy-header-form-{{ header.id }}" type="hidden" name="entity-class" value="{{ getApiHeaderClassName() }}" />
                                     <button form="dummy-header-form-{{ header.id }}" type="submit" class="btn btn-outline-danger">X</button>
                                 </div>
                             </li>
@@ -85,7 +85,7 @@
                                     {{ endpoint.contentType }}
                                 </div>
                                 <div class="flex-column text-end">
-                                    <a href="#" type="button" class="addEndpointHeaderButton" data-entity-id="{{ endpoint.id }}" data-bs-toggle="modal" data-bs-target="#headerEndpointModal">Add Header</a>
+                                    <a href="{{ path('app_admin_api_endpoint_detail', {id: endpoint.id}) }}">Edit</a>
                                     {% for method in endpoint.allowedMethods %}
                                         <span class="badge bg-primary text-uppercase ms-1">
                                             {{ method }}
@@ -95,7 +95,7 @@
                                 <div class="flex-column text-center ms-2">
                                     <input form="dummy-endpoint-form-{{ endpoint.id }}" type="hidden" name="success-redirect" value="{{ path('app_admin_api_detail', {id: entity.id}) }}" />
                                     <input form="dummy-endpoint-form-{{ endpoint.id }}" type="hidden" name="success-redirect-type" value="path" />
-                                    <input form="dummy-endpoint-form-{{ endpoint.id }}" type="hidden" name="entity-class" value="{{ dummyEndpointEntityClass }}" />
+                                    <input form="dummy-endpoint-form-{{ endpoint.id }}" type="hidden" name="entity-class" value="{{ getApiHeaderClassName() }}" />
                                     <button form="dummy-endpoint-form-{{ endpoint.id }}" type="submit" class="btn btn-outline-danger">X</button>
                                 </div>
                             </li>
@@ -116,147 +116,32 @@
 
     {% if create is not defined %}
         <!-- Endpoint modal -->
-        <div class="modal fade" id="endpointModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="endpointModalTitle">Create Endpoint</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form action="{{ path('app_entity_create') }}" method="post">
-                        <div class="modal-body">
-                            <input type="hidden" name="entity-class" value="{{ dummyEndpointEntityClass }}" />
-                            <input type="hidden" name="success-redirect" value="{{ path('app_admin_api_detail', {id: entity.id}) }}" />
-                            <input type="hidden" name="success-redirect-type" value="path" />
-                            <input type="hidden" name="dummyApiId" value="{{ entity.id }}"/>
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" name="path" id="endpointPath" placeholder="Path">
-                                <label for="name">Path</label>
-                            </div>
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" name="contentType" id="contentType" placeholder="Content Type+- ">
-                                <label for="name">Content Type</label>
-                            </div>
-                            <div class="form-floating">
-                                <select class="form-select multi-select" id="allowedMethods" name="allowedMethods[]" multiple aria-label="Floating multiple select">
-                                    <option value="get" selected>GET</option>
-                                    <option value="post">POST</option>
-                                    <option value="put">PUT</option>
-                                    <option value="patch">PATCH</option>
-                                    <option value="delete">DELETE</option>
-                                    <option value="propfind">PROPFIND</option>
-                                    <option value="view">VIEW</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+        {% include "component/modal/api-endpoint-create-modal.html.twig" with {
+            id: 'endpointModal',
+            title: 'Create Endpoint',
+            successRedirect: path('app_admin_api_detail', {id: entity.id}),
+            dummyApiId: entity.id
+        } %}
 
-        <!-- Endpoint Header modal -->
-        <div class="modal fade" id="headerEndpointModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="headerEndpointModalTitle">Add Header to Endpoint</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form action="{{ path('app_entity_create') }}" id="addEndpointHeaderModal" method="post">
-                        <div class="modal-body">
-                            <input type="hidden" name="entity-class" value="{{ dummyHeaderEntityClass }}" />
-                            <input type="hidden" name="success-redirect" value="{{ path('app_admin_api_detail', {id: entity.id}) }}" />
-                            <input type="hidden" name="success-redirect-type" value="path" />
-                            <input type="hidden" name="dummyApiEndpointId" value=""/>
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" name="name" id="headerName" placeholder="Key">
-                                <label for="name">Key</label>
-                            </div>
-                            <div class="form-floating mb-3">
-                                <select class="form-select" id="headerType" name="type" aria-label="Floating label select example">
-                                    <option value="required-any" selected>ANY VALUE</option>
-                                    <option value="required-value">REQUIRED VALUE</option>
-                                </select>
-                                <label for="floatingSelect">Select Value-Type</label>
-                            </div>
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" name="value" id="value" placeholder="Required Value">
-                                <label for="value">Value</label>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
 
         <!-- Header modal -->
-        <div class="modal fade" id="headerModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="headerModalTitle">Add Header to Dummy-Api</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form action="{{ path('app_entity_create') }}" method="post">
-                        <div class="modal-body">
-                            <input type="hidden" name="entity-class" value="{{ dummyHeaderEntityClass }}" />
-                            <input type="hidden" name="success-redirect" value="{{ path('app_admin_api_detail', {id: entity.id}) }}" />
-                            <input type="hidden" name="success-redirect-type" value="path" />
-                            <input type="hidden" name="dummyApiId" value="{{ entity.id }}"/>
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" name="name" id="headerName" placeholder="Key">
-                                <label for="name">Key</label>
-                            </div>
-                            <div class="form-floating mb-3">
-                                <select class="form-select" id="headerType" name="type" aria-label="Floating label select example">
-                                    <option value="required-any" selected>ANY VALUE</option>
-                                    <option value="required-value">REQUIRED VALUE</option>
-                                </select>
-                                <label for="floatingSelect">Select Value-Type</label>
-                            </div>
-                            <div class="form-floating mb-3">
-                                <input type="text" class="form-control" name="value" id="value" placeholder="Required Value">
-                                <label for="value">Value</label>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+        {% include "component/modal/api-header-create-modal.html.twig" with {
+            id: 'headerModal',
+            title: 'Add Header to Dummy-Api',
+            successRedirect: path('app_admin_api_detail', {id: entity.id}),
+            hiddenValues: {
+                dummyApiId: entity.id
+            }
+        } %}
 
 
         <!-- Delete Api Modal -->
-        <div class="modal fade" id="deleteApiModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="endpointModalTitle">Delete?</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form action="{{ path('app_entity_delete', {id: entity.id}) }}" method="post">
-                        <input type="hidden" name="success-redirect" value="{{ path('app_admin') }}" />
-                        <input type="hidden" name="success-redirect-type" value="path" />
-                        <input type="hidden" name="entity-class" value="{{ entityClass }}" />
-                        <div class="modal-footer d-flex justify-content-center">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                            <button type="submit" class="btn btn-danger">Yes</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
+        {% include "component/modal/entity-delete-modal.html.twig" with {
+            id: 'deleteApiModal',
+            title: 'Delete?',
+            entityId: entity.id,
+            entityClassName: getApiClassName(),
+            successRedirect: path('app_admin')
+        } %}
     {% endif %}
 {% endblock %}

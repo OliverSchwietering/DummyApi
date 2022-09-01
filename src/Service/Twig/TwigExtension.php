@@ -3,6 +3,8 @@
 namespace App\Service\Twig;
 
 use App\Entity\DummyApi;
+use App\Entity\DummyApiEndpoint;
+use App\Entity\DummyApiHeader;
 use Doctrine\Persistence\ManagerRegistry;
 use JetBrains\PhpStorm\ArrayShape;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -18,7 +20,11 @@ class TwigExtension extends \Twig\Extension\AbstractExtension
     {
         return [
             new TwigFunction('getMenuData', [$this, 'getMenuData']),
-            new TwigFunction('getApis', [$this, 'getApis'])
+            new TwigFunction('getApis', [$this, 'getApis']),
+            new TwigFunction('getApiClassName', [$this, 'getApiClassName']),
+            new TwigFunction('getApiEndpointClassName', [$this, 'getApiEndpointClassName']),
+            new TwigFunction('getApiHeaderClassName', [$this, 'getApiHeaderClassName']),
+            new TwigFunction('getUser', [$this->security, 'getUser'])
         ];
     }
 
@@ -66,6 +72,21 @@ class TwigExtension extends \Twig\Extension\AbstractExtension
         return $this->doctrine->getRepository(DummyApi::class)->findBy([
             "user" => $this->security->getUser()
         ]);
+    }
+
+    public function getApiClassName(): string
+    {
+        return DummyApi::class;
+    }
+
+    public function getApiEndpointClassName(): string
+    {
+        return DummyApiEndpoint::class;
+    }
+
+    public function getApiHeaderClassName(): string
+    {
+        return DummyApiHeader::class;
     }
 
     private function getCurrentRoute(){
