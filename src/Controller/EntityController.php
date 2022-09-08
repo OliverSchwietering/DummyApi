@@ -108,8 +108,13 @@ class EntityController extends AbstractController
             $successRedirectType = $parameters["success-redirect-type"] ?? "route";
 
             $entity = $this->doctrine->getRepository($entityClass)->findOneBy(["id" => $id]);
-            $this->doctrine->getManager()->remove($entity);
-            $this->doctrine->getManager()->flush();
+            if($entity !== null) {
+                $this->doctrine->getManager()->remove($entity);
+                $this->doctrine->getManager()->flush();
+            }
+            else {
+                $this->flashMessageGenerator->generateError(sprintf('%s with id "%s" not found', $entityClass, $id));
+            }
 
             return match ($successRedirectType) {
                 "path" => $this->redirect($successRedirect),

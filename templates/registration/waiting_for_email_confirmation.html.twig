@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('app_register') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('app_register') }}
+{% endblock %}
+
+{% block body %}
+    <div class="container d-flex justify-content-center">
+        <div class="card mt-5 p-5 w-100 register-modal">
+            <div class="text-center">
+                <h3>Schau in dein Email-Postfach</h3>
+                <p>Wir haben dir eine Bestätigungsemail gesendet, bitte klicke auf den mitgesandten Link um deinen Account zu aktivieren.</p>
+                <a class="btn btn-outline-primary" href="{{ path('app_login') }}">Zum Login</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

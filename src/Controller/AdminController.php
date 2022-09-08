@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Service\Message\Flash\FlashMessageGenerator;
 use App\Service\Message\Flash\FlashMessageTypeEnum;
 use Doctrine\Persistence\ManagerRegistry;
+use Swift_Message;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,6 +24,19 @@ class AdminController extends AbstractController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         return $this->redirectToRoute('app_admin');
+    }
+
+    #[Route("/test", name: 'app_test')]
+    public function test(\Swift_Mailer $mailer): Response
+    {
+        $message = (new Swift_Message('Hello Email'))
+            ->setFrom('no-reply@progressio-development.de')
+            ->setTo('os@group24.de')
+            ->setBody('You should see me from the profiler!')
+        ;
+
+        $mailer->send($message);
+        return new Response("done");
     }
 
     #[Route('/admin', name: 'app_admin')]

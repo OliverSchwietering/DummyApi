@@ -35,6 +35,10 @@
         <input form="dummy-form" type="hidden" name="success-redirect" value="app_admin_api_detail">
         <input form="dummy-form" type="hidden" name="success-redirect-type" value="entity-detail-route" />
 
+        <div class="form-floating mb-3">
+            <input class="form-control" type="text" value="{{ url('app_dummy_api_base', {dummyApiId: entity.id}) }}" name="base-url" id="base-url" aria-label="Disabled input" disabled readonly>
+            <label for="base-url">Base Url</label>
+        </div>
 
         <div class="form-floating mb-3">
             <input form="dummy-form" type="text" class="form-control" name="name" id="name" placeholder="test" {% if entity is defined %}value="{{ entity.name }}"{% endif %}>
@@ -95,7 +99,7 @@
                                 <div class="flex-column text-center ms-2">
                                     <input form="dummy-endpoint-form-{{ endpoint.id }}" type="hidden" name="success-redirect" value="{{ path('app_admin_api_detail', {id: entity.id}) }}" />
                                     <input form="dummy-endpoint-form-{{ endpoint.id }}" type="hidden" name="success-redirect-type" value="path" />
-                                    <input form="dummy-endpoint-form-{{ endpoint.id }}" type="hidden" name="entity-class" value="{{ getApiHeaderClassName() }}" />
+                                    <input form="dummy-endpoint-form-{{ endpoint.id }}" type="hidden" name="entity-class" value="{{ getApiEndpointClassName() }}" />
                                     <button form="dummy-endpoint-form-{{ endpoint.id }}" type="submit" class="btn btn-outline-danger">X</button>
                                 </div>
                             </li>

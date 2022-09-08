@@ -4,15 +4,26 @@
 
     {% set user = getUser() %}
     <div class="container">
-        <form action="{{ path('app_entity_update', {id: user.id}) }}" id="entityUpdateForm" method="post"></form>
+        <form action="{{ path('app_account_profile_set_password') }}" id="setUserPasswordForm" method="post"></form>
 
-        {{ dump(user) }}
-        <div class="row">
-            <div class="mb-3">
-                <input class="form-control" type="text" value="{{ user.email }}" aria-label="Disabled input" disabled readonly>
+        <div class="mt-5">
+            <div class="row mb-3">
+                <div class="col-2">
+                    <p>Email</p>
+                </div>
+                <div class="col-10">
+                    <input class="form-control" type="text" value="{{ user.email }}" aria-label="Disabled input" disabled readonly>
+                </div>
             </div>
-            <div class="mb-3">
-
+            <div class="row mb-3">
+                <div class="col-2">
+                    <p>Neues Passwort</p>
+                </div>
+                <div class="col-10">
+                    <input placeholder="Altes Passwort" form="setUserPasswordForm" class="form-control mb-1" type="password" name="oldPassword" id="oldPassword">
+                    <input placeholder="Neues Passwort" form="setUserPasswordForm" class="form-control mb-3" type="password" name="newPassword" id="newPassword">
+                    <button form="setUserPasswordForm" type="submit" class="btn btn-outline-primary">Passwort zurücksetzen</button>
+                </div>
             </div>
         </div>
     </div>

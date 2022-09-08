@@ -20,8 +20,14 @@ class DummyApiController extends AbstractController
 
     public function __construct(private ManagerRegistry $doctrine){}
 
+    #[Route('/dummy-api/{dummyApiId}', name: 'app_dummy_api_base')]
+    public function dummyApiBase(): Response
+    {
+        return new JsonResponse(["message" => "This is the base path"]);
+    }
+
     #[Route('/dummy-api/{dummyApiId}/{path}', name: 'app_dummy_api', requirements: ['path' => '.+'])]
-    public function dummyApiBasePath(string $dummyApiId, string $path, Request $request): Response
+    public function dummyApiEndpoint(string $dummyApiId, string $path, Request $request): Response
     {
         $repository = $this->doctrine->getRepository(DummyApi::class);
         if(!\Symfony\Component\Uid\Uuid::isValid($dummyApiId)) return new JsonResponse(["message" => "Id not valid"]);

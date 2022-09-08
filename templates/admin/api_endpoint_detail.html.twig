@@ -32,6 +32,17 @@
             <input form="entityUpdateForm" type="hidden" name="success-redirect" value="{{ path('app_admin_api_endpoint_detail', {id: entity.id}) }}" />
             <input form="entityUpdateForm" type="hidden" name="success-redirect-type" value="path" />
             <input form="entityUpdateForm" type="hidden" name="dummyApiId" value="{{ entity.dummyApi.id }}"/>
+
+
+            <div class="form-floating mb-3">
+                {% if entity.path|length > 0 %}
+                        <input class="form-control" type="text" value="{{ (url('app_dummy_api', {dummyApiId: entity.dummyApi.id, path: entity.path })|replace({'//': '/'}))|replace({'https:/': 'https://', 'http:/': 'http://'}) }}" name="base-url" id="base-url" aria-label="Disabled input" disabled readonly>
+                    {% else %}
+                        <input class="form-control" type="text" value="{{ url('app_dummy_api_base', {dummyApiId: entity.dummyApi.id }) }}" name="base-url" id="base-url" aria-label="Disabled input" disabled readonly>
+                {% endif %}
+                <label for="base-url">Base Url</label>
+            </div>
+
             <div class="form-floating mb-3">
                 <input form="entityUpdateForm" type="text" class="form-control" name="path" id="endpointPath" placeholder="Path" value="{{ entity.path }}">
                 <label for="path">Path</label>
